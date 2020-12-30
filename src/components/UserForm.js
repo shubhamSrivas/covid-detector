@@ -2,10 +2,8 @@ import React, { Component } from 'react';
 import About from './About';
 import Consent from './Consent';
 import Confirm from './Confirm';
-import HealthInfo from './HealthInfo';
 import BasicInfo from './BasicInfo';
 import CoughSound from './CoughSound';
-import GeographicalInfo from './GeographicalInfo';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -44,6 +42,7 @@ const styles = ((theme) => ({
     },
   },
   stepper: {
+    display: '',
     padding: theme.spacing(3, 0, 5),
   },
   buttons: {
@@ -56,7 +55,7 @@ const styles = ((theme) => ({
   },
 }));
 
-const steps = ['About', 'Confirmation', 'BasicInfo','HealthInfo','GeographicalInfo','CoughSound','A-Sound','E-Sound','O-Sound','Count-Sound','Alphabet-Sound','Confirm'];
+const steps = ['About', 'Consent', 'BasicInfo','Sound-Recording','Confirm'];
 
 class UserForm extends Component {
   state = {
@@ -66,7 +65,12 @@ class UserForm extends Component {
     email: '',
     occupation: '',
     city: '',
-    bio: ''
+    coughSoundURL: '',
+    aaaSoundURL: '',
+    eeeSoundURL: '',
+    oooSoundURL: '',
+    countSoundURL: '',
+    alphabetSoundURL: '',
   };
   // Proceed to next step
   nextStep = () => {
@@ -84,71 +88,51 @@ class UserForm extends Component {
     });
   };
 
+  onSubmit = () => {
+    console.log("send the data");
+  }
   // Handle fields change
   handleChange = input => e => {
     this.setState({ [input]: e.target.value });
   };
 
   getStepContent = (step) => {
+    const {firstName, lastName, email, occupation, city, coughSoundURL, aaaSoundURL, eeeSoundURL, oooSoundURL, countSoundURL, alphabetSoundURL} = this.state;
+    const values = {firstName, lastName, email, occupation, city, coughSoundURL, aaaSoundURL, eeeSoundURL, oooSoundURL, countSoundURL, alphabetSoundURL};
     switch (step) {
       case 0:
         return (
-          <About/>
+          <About
+          />
         );
       case 1:
         return (
-          <Consent/>
+          <Consent
+          handleChange={this.handleChange}
+          values={values}
+          />
         );
       case 2:
         return (
-          <BasicInfo/>
+          /*health info,geographical info, basic info*/
+          <BasicInfo
+          handleChange={this.handleChange}
+          values={values}
+          />
         );
       case 3:
         return (
-          <HealthInfo/>
+          /* cough, aa,ee,oo,count,alpha sound*/
+          <CoughSound
+          handleChange={this.handleChange}
+          values={values}
+          />
         );
       case 4:
         return (
-          <GeographicalInfo/>
-        );
-      case 5:
-        return (
-          <CoughSound
-          />
-        );
-      case 6:
-        return (
-          /*aaa sound */
-          <CoughSound
-          />
-        );
-      case 7:
-        return (
-          /**eee sound */
-          <CoughSound
-          />
-        );
-      case 8:
-        return (
-          /**ooo sound */
-          <CoughSound
-          />
-        );
-      case 9:
-        return (
-          /**count sound */
-          <CoughSound
-          />
-        );
-      case 10:
-        return (
-          /**alphabet sound */
-          <CoughSound
-          />
-        );
-      case 11:
-        return (
           <Confirm
+          handleChange={this.handleChange}
+          values={values}
           />
         );
       default:
@@ -168,14 +152,16 @@ class UserForm extends Component {
             <Typography component="h1" variant="h4" align="center">
               Covid-Detector
             </Typography>
-            <Stepper activeStep={step} className={classes.stepper}>
-              {steps.map((label) => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
             <React.Fragment>
+
+              <Stepper activeStep={step} className={classes.stepper}>
+                {
+                steps.map((label) => (
+                  <Step key={label}>
+                    <StepLabel>{label}</StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
               {step === steps.length ? (
                 <React.Fragment>
                   <Typography variant="h5" gutterBottom>
@@ -197,7 +183,7 @@ class UserForm extends Component {
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={this.nextStep}
+                      onClick={steps===steps.length-1 ? this.onSubmit : this.nextStep}
                       className={classes.button}
                     >
                       {step === steps.length - 1 ? 'Submit' : 'Next'}
